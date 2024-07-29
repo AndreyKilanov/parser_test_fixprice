@@ -6,7 +6,13 @@ import scrapy
 from .. import utils
 from .. import xpathes
 from ..items import ParserFixpriceItem
-from ..settings import FLARE_SOLVER_URL, LOCALITY, URL, URL_CATALOG
+from ..settings import (
+    FLARE_SOLVER_URL,
+    LOCALITY,
+    URL,
+    URL_CATALOG,
+    CATEGORY_PARSE_URL
+)
 
 categories_tree = []
 list_products = []
@@ -64,8 +70,10 @@ class FixpriceSpider(scrapy.Spider):
                     {'section': [sec_name], 'url': URL + sec_href}
                 )
 
-        # Указываем категории для парсинга либо убираем срез и парсим всё
-        for category in categories_tree[1:10]:
+        parse_categories = (
+            categories_tree if not CATEGORY_PARSE_URL else CATEGORY_PARSE_URL
+        )
+        for category in parse_categories:
             yield scrapy.Request(
                 url=category['url'],
                 cookies=cookies,
